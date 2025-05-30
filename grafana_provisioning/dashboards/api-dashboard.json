@@ -1,0 +1,78 @@
+{
+  "apiVersion": 1,
+  "uid": "api-metrics-python",
+  "title": "Python API Metrics Dashboard",
+  "panels": [
+    {
+      "type": "graph",
+      "title": "HTTP Requests Total",
+      "gridPos": { "x": 0, "y": 0, "w": 12, "h": 8 },
+      "targets": [
+        {
+          "expr": "sum(rate(http_requests_total[5m])) by (method, endpoint, status_code)",
+          "legendFormat": "{{method}} {{endpoint}} ({{status_code}})",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "type": "graph",
+      "title": "HTTP Request Duration (P90)",
+      "gridPos": { "x": 12, "y": 0, "w": 12, "h": 8 },
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.90, sum(rate(http_request_duration_seconds_bucket[5m])) by (le, method, endpoint))",
+          "legendFormat": "{{method}} {{endpoint}} P90",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "type": "singlestat",
+      "title": "HTTP Errors Total",
+      "gridPos": { "x": 0, "y": 8, "w": 6, "h": 8 },
+      "targets": [
+        {
+          "expr": "sum(http_errors_total)",
+          "refId": "A"
+        }
+      ],
+      "options": {
+        "valueMaps": [
+          {
+            "op": ">",
+            "value": "0",
+            "text": "Errors"
+          }
+        ],
+        "thresholds": "0,1",
+        "colors": ["#299c46", "rgba(237, 129, 40, 0.89)", "#d44a2a"]
+      }
+    },
+    {
+      "type": "singlestat",
+      "title": "API Status",
+      "gridPos": { "x": 6, "y": 8, "w": 6, "h": 8 },
+      "targets": [
+        {
+          "expr": "up{job='python_api'}",
+          "refId": "A"
+        }
+      ],
+      "options": {
+        "valueMaps": [
+          {
+            "value": "1",
+            "text": "Up"
+          },
+          {
+            "value": "0",
+            "text": "Down"
+          }
+        ],
+        "thresholds": "0,1",
+        "colors": ["#d44a2a", "rgba(237, 129, 40, 0.89)", "#299c46"]
+      }
+    }
+  ]
+}
